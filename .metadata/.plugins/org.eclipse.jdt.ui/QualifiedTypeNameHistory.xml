@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShapeRenderer"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Color"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.files.FileHandle"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.BitmapFont"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.Rectangle"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.GL10"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.InputProcessor"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.Input"/>
+<fullyQualifiedTypeName name="java.util.Random"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.Input.Buttons"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.VertexAttribute"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShaderProgram"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.VertexAttributes"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g3d.utils.MeshBuilder"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector3"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.VertexAttributes.Usage"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Mesh"/>
+<fullyQualifiedTypeName name="com.doublev.racing.debug.Grid"/>
+<fullyQualifiedTypeName name="com.doublev.racing.constants.Constants"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.ScissorStack"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.Matrix4"/>
+</qualifiedTypeNameHistroy>
