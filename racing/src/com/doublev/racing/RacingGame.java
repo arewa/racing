@@ -39,8 +39,16 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	private OrthographicCamera camera;
 	private Mesh grid;
+	
 	private Mesh bottomToolsPanel;
+	
+	// Car
 	private Mesh myCar;
+	private Mesh myCarSelectBox;
+	private boolean isCarSelected = false;
+	
+	private ShapeRenderer shapeRenderer;
+	
 	private MeshBuilder meshBuilder = new MeshBuilder();
 	
 	private Matrix4 gridMatrix = new Matrix4();
@@ -48,6 +56,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	private BitmapFont debugFont;
 
 	private int currentWidth, currentHeight;
+	private int mouseMovedX, mouseMovedY;
 
 	private Rectangle glViewport;
 
@@ -64,6 +73,8 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 				new TextureRegion(texture), false);
 		debugFont.setColor(Color.MAGENTA);
 		debugBatch = new SpriteBatch();
+		
+		shapeRenderer = new ShapeRenderer();
 
 		Gdx.input.setInputProcessor(this);
 	}
@@ -84,9 +95,11 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 		renderGrid();
 		
-		renderBottomToolsPanel();
+		renderCarSelectBox();
 		
-		renderMyCar();
+		renderCar();
+		
+		renderBottomToolsPanel();
 
 		StringBuffer m = new StringBuffer().append("FPS: ")
 				.append(Gdx.graphics.getFramesPerSecond()).append(", w = ")
@@ -115,7 +128,17 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		debugFont.dispose();
+		debugBatch.dispose();
+		grid.dispose();
+		bottomToolsPanel.dispose();
+		myCar.dispose();
+		
+		if (myCarSelectBox != null) {
+			myCarSelectBox.dispose();
+		}
+		
+		shapeRenderer.dispose();
 	}
 
 	@Override
@@ -169,7 +192,16 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
-
+		
+		Vector3 touchPoint = new Vector3(x, y, 0);
+		camera.unproject(touchPoint);
+		
+		if (myCar.calculateBoundingBox().contains(touchPoint)) {
+			isCarSelected = true;
+		} else {
+			isCarSelected = false;
+		}
+		
 		return false;
 	}
 
@@ -190,22 +222,27 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+		
+		this.mouseMovedX = screenX;
+		this.mouseMovedY = screenY;
+		
 		return false;
 	}
 	
-	private void renderMyCar() {
+	private void renderCar() {
+		
+		// Begin construct car
 		meshBuilder.begin(VertexAttributes.Usage.Position
 				| VertexAttributes.Usage.Color, GL10.GL_TRIANGLES);
 		meshBuilder.setColor(Color.ORANGE);
 		
-		float halfCarSize = 16.0f;
 		float screenCenterX = currentWidth / 2;
 		float screenCenterY = (currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT) / 2;
 		
-		Vector3 corner1 = new Vector3(screenCenterX - halfCarSize, screenCenterY - halfCarSize, 0);
-		Vector3 corner2 = new Vector3(screenCenterX - halfCarSize, screenCenterY + halfCarSize, 0);
-		Vector3 corner3 = new Vector3(screenCenterX + halfCarSize, screenCenterY + halfCarSize, 0);
-		Vector3 corner4 = new Vector3(screenCenterX + halfCarSize, screenCenterY - halfCarSize, 0);
+		Vector3 corner1 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE, screenCenterY - Constants.HALF_CAR_SIZE, 0);
+		Vector3 corner2 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE, screenCenterY + Constants.HALF_CAR_SIZE, 0);
+		Vector3 corner3 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE, screenCenterY + Constants.HALF_CAR_SIZE, 0);
+		Vector3 corner4 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE, screenCenterY - Constants.HALF_CAR_SIZE, 0);
 		
 		camera.unproject(corner1);
 		camera.unproject(corner2);
@@ -219,8 +256,58 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 				corner4, 
 				null);
 		myCar = meshBuilder.end();
+		// End construct car
 		
 		myCar.render(GL10.GL_TRIANGLES);
+		
+		int markerX = Math.round(this.mouseMovedX / Constants.MAP_CELL_STEP);
+		int markerY = Math.round(this.mouseMovedY / Constants.MAP_CELL_STEP);
+		
+		Vector3 screenCoords = new Vector3(markerX * Constants.MAP_CELL_STEP, markerY * Constants.MAP_CELL_STEP, 0);
+		camera.unproject(screenCoords);
+		
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		// Begin construct select marker
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.setColor(Color.MAGENTA);
+		shapeRenderer.circle(screenCoords.x, screenCoords.y, 5);
+		shapeRenderer.end();
+	}
+	
+	private void renderCarSelectBox() {
+		if (!isCarSelected) {
+			return;
+		}
+		
+		float screenCenterX = currentWidth / 2;
+		float screenCenterY = (currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT) / 2;
+		
+		// Begin construct car select box
+		meshBuilder.begin(VertexAttributes.Usage.Position
+				| VertexAttributes.Usage.Color, GL10.GL_TRIANGLES);
+		meshBuilder.setColor(Color.RED);
+		
+		Vector3 corner1 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT, screenCenterY - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT, 0);
+		Vector3 corner2 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT , screenCenterY + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, 0);
+		Vector3 corner3 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, screenCenterY + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, 0);
+		Vector3 corner4 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, screenCenterY - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT, 0);
+		
+		camera.unproject(corner1);
+		camera.unproject(corner2);
+		camera.unproject(corner3);
+		camera.unproject(corner4);
+		
+		meshBuilder.rect(
+				corner1, 
+				corner2, 
+				corner3,
+				corner4, 
+				null);
+		
+		myCarSelectBox = meshBuilder.end();
+		// End construct car select box
+		
+		myCarSelectBox.render(GL10.GL_TRIANGLES);
 	}
 	
 	private void renderBottomToolsPanel() {
