@@ -31,6 +31,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.doublev.racing.constants.Constants;
 import com.doublev.racing.debug.Grid;
@@ -94,6 +95,8 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		camera.apply(gl);
 
 		renderGrid();
+		
+		renderMouseMarker();
 		
 		renderCarSelectBox();
 		
@@ -192,11 +195,12 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
-		
 		Vector3 touchPoint = new Vector3(x, y, 0);
 		camera.unproject(touchPoint);
 		
-		if (myCar.calculateBoundingBox().contains(touchPoint)) {
+		BoundingBox carBoundingBox = myCar.calculateBoundingBox();
+		
+		if (carBoundingBox.contains(touchPoint)) {
 			isCarSelected = true;
 		} else {
 			isCarSelected = false;
@@ -259,7 +263,9 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		// End construct car
 		
 		myCar.render(GL10.GL_TRIANGLES);
-		
+	}
+	
+	private void renderMouseMarker() {
 		int markerX = Math.round(this.mouseMovedX / Constants.MAP_CELL_STEP);
 		int markerY = Math.round(this.mouseMovedY / Constants.MAP_CELL_STEP);
 		
