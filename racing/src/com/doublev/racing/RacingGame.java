@@ -57,7 +57,9 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	private BitmapFont debugFont;
 
 	private int currentWidth, currentHeight;
-	private int mouseMovedX, mouseMovedY;
+	private Vector3 markerScreenPos;
+	private Vector3 mouseWorldPos;
+	private Vector3 cameraTranslationSteps;
 
 	private Rectangle glViewport;
 
@@ -104,11 +106,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		
 		renderBottomToolsPanel();
 
-		StringBuffer m = new StringBuffer().append("FPS: ")
-				.append(Gdx.graphics.getFramesPerSecond()).append(", w = ")
-				.append(currentWidth).append(", h = ").append(currentHeight);
-
-		debug(m.toString());
+		debug();
 
 	}
 
@@ -119,9 +117,11 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		this.currentHeight = height;
 
 		camera = new OrthographicCamera(width, height);
-		// camera.setToOrtho(true);
 		camera.position.set(width / 2, height / 2, 0);
 		glViewport = new Rectangle(0, 0, width, height);
+		
+		mouseWorldPos = new Vector3(0, 0, 0);
+		cameraTranslationSteps = new Vector3(0, 0, 0);
 	}
 
 	@Override
@@ -163,21 +163,25 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		if (keycode == Input.Keys.LEFT) {
 			// if (camera.position.x > w / 2)
 			camera.translate(-translateStep, 0, 0);
+			cameraTranslationSteps.x -= translateStep;
 		}
 		if (keycode == Input.Keys.RIGHT) {
 			// if (camera.position.x < (tmxMap.mapWidthInPixels -
 			// HALF_CAMERA_WIDTH))
 			camera.translate(translateStep, 0, 0);
+			cameraTranslationSteps.x += translateStep;
 		}
 		if (keycode == Input.Keys.UP) {
 			// if (camera.position.y > HALF_CAMERA_HEIGHT +
 			// HALF_TOOLS_PANEL_HEIGHT)
 			camera.translate(0, translateStep, 0);
+			cameraTranslationSteps.y += translateStep;
 		}
 		if (keycode == Input.Keys.DOWN) {
 			// if (camera.position.y < (tmxMap.mapHeightInPixels -
 			// HALF_CAMERA_HEIGHT - HALF_TOOLS_PANEL_HEIGHT))
 			camera.translate(0, -translateStep, 0);
+			cameraTranslationSteps.y -= translateStep;
 		}
 
 		return false;
@@ -227,8 +231,8 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
 		
-		this.mouseMovedX = screenX;
-		this.mouseMovedY = screenY;
+		this.mouseWorldPos = new Vector3(screenX, screenY, 0);
+		camera.unproject(this.mouseWorldPos);
 		
 		return false;
 	}
@@ -266,17 +270,18 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	}
 	
 	private void renderMouseMarker() {
-		int markerX = Math.round(this.mouseMovedX / Constants.MAP_CELL_STEP);
-		int markerY = Math.round(this.mouseMovedY / Constants.MAP_CELL_STEP);
 		
-		Vector3 screenCoords = new Vector3(markerX * Constants.MAP_CELL_STEP, markerY * Constants.MAP_CELL_STEP, 0);
-		camera.unproject(screenCoords);
+		int markerX = Math.round(mouseWorldPos.x / Constants.MAP_CELL_STEP);
+		int markerY = Math.round(mouseWorldPos.y / Constants.MAP_CELL_STEP);
+		
+		markerScreenPos = new Vector3(markerX * Constants.MAP_CELL_STEP, markerY * Constants.MAP_CELL_STEP, 0);
+		camera.project(markerScreenPos);
 		
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		// Begin construct select marker
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(Color.MAGENTA);
-		shapeRenderer.circle(screenCoords.x, screenCoords.y, 5);
+		shapeRenderer.circle(markerScreenPos.x + cameraTranslationSteps.x, markerScreenPos.y + cameraTranslationSteps.y, 5);
 		shapeRenderer.end();
 	}
 	
@@ -354,21 +359,34 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		Gdx.gl.glDisable(GL10.GL_SCISSOR_TEST);
 	}
 
-	private void debug(String str) {
+	private void debug() {
 		if (Constants.IS_DEBUG) {
 			debugBatch.setProjectionMatrix(camera.combined);
 			debugBatch.flush();
 			Gdx.gl10.glEnable(GL10.GL_ALPHA_TEST);
 			Gdx.gl10.glAlphaFunc(GL10.GL_GREATER, 0.5f);
+			
+			StringBuffer m = new StringBuffer().append("FPS: ")
+					.append(Gdx.graphics.getFramesPerSecond()).append(", w = ")
+					.append(currentWidth).append(", h = ").append(currentHeight);
 
-			TextBounds b = debugFont.getBounds(str);
+			TextBounds b = debugFont.getBounds(m.toString());
 			Vector3 v = new Vector3(currentWidth - b.width - 5, currentHeight
 					- b.height - 5, 0.0f);
 			camera.unproject(v);
 
 			debugBatch.setProjectionMatrix(camera.combined);
 			debugBatch.begin();
-			debugFont.draw(debugBatch, str, v.x, v.y);
+			debugFont.draw(debugBatch, m.toString(), v.x, v.y);
+			
+			//m = new StringBuffer().append("Cursor at: ").append(this.markerScreenPos.x).append(", ").append(this.markerScreenPos.y);
+			
+			//debugFont.draw(debugBatch, m.toString(), v.x, v.y + b.height + 5);
+			
+			m = new StringBuffer().append("Cursor at: ").append(this.mouseWorldPos.x).append(", ").append(this.mouseWorldPos.y);
+			
+			debugFont.draw(debugBatch, m.toString(), v.x, v.y + b.height + 5);
+			
 			debugBatch.end();
 
 			debugBatch.flush();
