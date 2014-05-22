@@ -20,12 +20,12 @@ public class RaceData {
 		this.trackData = new int[i][j];
 		
 		// Manually init walls
-		this.trackData[0][0] = WALL;
-		this.trackData[0][2] = WALL;
-		this.trackData[0][5] = WALL;
-		this.trackData[2][5] = WALL;
-		this.trackData[1][0] = WALL;
-		this.trackData[2][2] = WALL;
+//		this.trackData[0][0] = WALL;
+//		this.trackData[0][2] = WALL;
+//		this.trackData[0][5] = WALL;
+//		this.trackData[2][5] = WALL;
+//		this.trackData[1][0] = WALL;
+//		this.trackData[2][2] = WALL;
 	}
 	
 	public void updatePlayerPosition(Position pos) {
@@ -36,11 +36,29 @@ public class RaceData {
 		trackData[pos.i][pos.j] = ENEMY;
 	}
 	
-	public void updateRaceData() {
+	public void update() {
 		for (int i = 0; i < trackWidth; i ++) {
 			for (int j = 0; j < trackHeight; j ++) {
 				if (trackData[i][j] == RaceData.PLAYER) {
-					
+					for (int k = i - playerSpeed; k <= i + playerSpeed; k ++) {
+						for (int n = j - playerSpeed; n <= j + playerSpeed; n ++) {
+							if ((k == i) && (n == j)) {
+								continue;
+							}
+							
+							if ((k + n) % 2 == 0 || (k == i) || (n == j) || (k == n)) {
+								trackData[k][n] = NEXT_TURN;
+							}
+							
+//							if ((k == i) || (n == j) || (k == n)) {
+//								trackData[k][n] = NEXT_TURN;
+//							}
+//							
+//							if (k == i + playerSpeed) {
+//								trackData[k][n] = NEXT_TURN;
+//							}
+						}
+					}
 				}
 			}
 		}
