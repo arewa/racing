@@ -1,19 +1,22 @@
 package com.doublev.racing.model;
 
-public class RaceTrack {
+public class RaceData {
 	
 	public static short PLAYER = 2;
 	public static short WALL = 1;
 	public static short ENEMY = 3;
 	public static short EMPTY = 0;
+	public static short NEXT_TURN = 100;
 	
 	public int[][] trackData;
-	public int width;
-	public int height;
+	public int trackWidth;
+	public int trackHeight;
+	
+	public int playerSpeed = 1;
 	
 	public void init(int i, int j) {
-		this.width = i;
-		this.height = j;
+		this.trackWidth = i;
+		this.trackHeight = j;
 		this.trackData = new int[i][j];
 		
 		// Manually init walls
@@ -31,5 +34,15 @@ public class RaceTrack {
 	
 	public void updateEnemyPosition(Position pos) {
 		trackData[pos.i][pos.j] = ENEMY;
+	}
+	
+	public void updateRaceData() {
+		for (int i = 0; i < trackWidth; i ++) {
+			for (int j = 0; j < trackHeight; j ++) {
+				if (trackData[i][j] == RaceData.PLAYER) {
+					
+				}
+			}
+		}
 	}
 }

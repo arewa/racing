@@ -19,8 +19,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.doublev.racing.constants.Constants;
 import com.doublev.racing.debug.Grid;
 import com.doublev.racing.model.Position;
-import com.doublev.racing.model.RaceTrack;
+import com.doublev.racing.model.RaceData;
 import com.doublev.racing.render.Enemy;
+import com.doublev.racing.render.NextTurn;
 import com.doublev.racing.render.Player;
 import com.doublev.racing.render.Wall;
 
@@ -39,7 +40,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	private Rectangle glViewport;
 	
-	private RaceTrack raceTrack;
+	private RaceData raceData;
 
 	@Override
 	public void create() {
@@ -56,8 +57,8 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		
 		shapeRenderer = new ShapeRenderer();
 		
-		raceTrack = new RaceTrack();
-		raceTrack.init(10, 32);
+		raceData = new RaceData();
+		raceData.init(10, 32);
 
 		Gdx.input.setInputProcessor(this);
 	}
@@ -188,23 +189,27 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	}
 	
 	private void renderRaceTrack() {
-		raceTrack.updatePlayerPosition(new Position(1, 1));
-		raceTrack.updateEnemyPosition(new Position(3, 3));
+		raceData.updatePlayerPosition(new Position(1, 1));
+		raceData.updateEnemyPosition(new Position(3, 3));
 		
-		for (int i = 0; i < raceTrack.width; i ++) {
-			for (int j = 0; j < raceTrack.height; j ++) {
-				if (raceTrack.trackData[i][j] == RaceTrack.PLAYER) {
+		for (int i = 0; i < raceData.trackWidth; i ++) {
+			for (int j = 0; j < raceData.trackHeight; j ++) {
+				if (raceData.trackData[i][j] == RaceData.PLAYER) {
 					Player player = new Player();
 					player.setPosition(new Position(i, j));
 					player.getRenderSurface().render(GL10.GL_TRIANGLES);
-				} else if (raceTrack.trackData[i][j] == RaceTrack.WALL) {
+				} else if (raceData.trackData[i][j] == RaceData.WALL) {
 					Wall wall = new Wall();
 					wall.setPosition(new Position(i, j));
 					wall.getRenderSurface().render(GL10.GL_TRIANGLES);
-				} else if (raceTrack.trackData[i][j] == RaceTrack.ENEMY) {
+				} else if (raceData.trackData[i][j] == RaceData.ENEMY) {
 					Enemy enemy = new Enemy();
 					enemy.setPosition(new Position(i, j));
 					enemy.getRenderSurface().render(GL10.GL_TRIANGLES);
+				} else if (raceData.trackData[i][j] == RaceData.NEXT_TURN) {
+					NextTurn nextTurn = new NextTurn();
+					nextTurn.setPosition(new Position(i, j));
+					nextTurn.getRenderSurface().render(GL10.GL_TRIANGLES);
 				}
 			}
 		}
