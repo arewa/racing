@@ -5,13 +5,17 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.doublev.racing.constants.Constants;
+import com.doublev.racing.model.RenderedObject;
 
-public class Grid {
+public class Grid implements RenderedObject {
 	private final Color color = Color.GREEN;
+	private Matrix4 gridMatrix = new Matrix4();
 
-	public Mesh create() {
+	@Override
+	public Mesh getRenderSurface() {
 		MeshBuilder meshBuilder = new MeshBuilder();
 		meshBuilder.begin(VertexAttributes.Usage.Position | VertexAttributes.Usage.Color, GL10.GL_LINES);
 		meshBuilder.setColor(this.color);
@@ -28,8 +32,9 @@ public class Grid {
 			meshBuilder.line(from, to);
 		}
 		
+		Mesh grid = meshBuilder.end();
+		grid.transform(gridMatrix);
 		
-		
-		return meshBuilder.end();
+		return grid;
 	}
 }

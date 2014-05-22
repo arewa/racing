@@ -1,72 +1,52 @@
 package com.doublev.racing;
 
-import java.util.Random;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.doublev.racing.constants.Constants;
 import com.doublev.racing.debug.Grid;
+import com.doublev.racing.model.Player;
+import com.doublev.racing.model.Position;
+import com.doublev.racing.model.RaceTrack;
 
 public class RacingGame implements ApplicationListener, InputProcessor {
 
 	private OrthographicCamera camera;
-	private Mesh grid;
-	
-	private Mesh bottomToolsPanel;
-	
-	// Car
-	private Mesh myCar;
-	private Mesh myCarSelectBox;
-	private boolean isCarSelected = false;
+	private Grid grid;
+	private Player player;
 	
 	private ShapeRenderer shapeRenderer;
 	
-	private MeshBuilder meshBuilder = new MeshBuilder();
-	
-	private Matrix4 gridMatrix = new Matrix4();
 	private SpriteBatch debugBatch;
 	private BitmapFont debugFont;
 
 	private int currentWidth, currentHeight;
-	private Vector3 markerScreenPos;
-	private Vector3 mouseWorldPos;
 	private Vector3 cameraTranslationSteps;
 
 	private Rectangle glViewport;
+	
+	private RaceTrack raceTrack;
 
 	@Override
 	public void create() {
-		grid = new Grid().create();
-		grid.transform(gridMatrix);
+		grid = new Grid();
+		player = new Player();
 
 		Texture texture = new Texture(
 				Gdx.files.internal(Constants.DEBUG_FONT_PNG), true);
@@ -78,6 +58,9 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		debugBatch = new SpriteBatch();
 		
 		shapeRenderer = new ShapeRenderer();
+		
+		raceTrack = new RaceTrack();
+		raceTrack.init(10, 32);
 
 		Gdx.input.setInputProcessor(this);
 	}
@@ -98,13 +81,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 		renderGrid();
 		
-		renderMouseMarker();
-		
-		renderCarSelectBox();
-		
 		renderCar();
-		
-		renderBottomToolsPanel();
 
 		debug();
 
@@ -120,7 +97,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		camera.position.set(width / 2, height / 2, 0);
 		glViewport = new Rectangle(0, 0, width, height);
 		
-		mouseWorldPos = new Vector3(0, 0, 0);
 		cameraTranslationSteps = new Vector3(0, 0, 0);
 	}
 
@@ -133,14 +109,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	public void dispose() {
 		debugFont.dispose();
 		debugBatch.dispose();
-		grid.dispose();
-		bottomToolsPanel.dispose();
-		myCar.dispose();
-		
-		if (myCarSelectBox != null) {
-			myCarSelectBox.dispose();
-		}
-		
 		shapeRenderer.dispose();
 	}
 
@@ -199,17 +167,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
-		Vector3 touchPoint = new Vector3(x, y, 0);
-		camera.unproject(touchPoint);
-		
-		BoundingBox carBoundingBox = myCar.calculateBoundingBox();
-		
-		if (carBoundingBox.contains(touchPoint)) {
-			isCarSelected = true;
-		} else {
-			isCarSelected = false;
-		}
-		
 		return false;
 	}
 
@@ -230,133 +187,26 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		
-		this.mouseWorldPos = new Vector3(screenX, screenY, 0);
-		camera.unproject(this.mouseWorldPos);
-		
 		return false;
 	}
 	
 	private void renderCar() {
+		player.updatePosition(new Position(1, 1));
+		raceTrack.updatePlayerPosition(player.getPosition());
 		
-		// Begin construct car
-		meshBuilder.begin(VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Color, GL10.GL_TRIANGLES);
-		meshBuilder.setColor(Color.ORANGE);
-		
-		float screenCenterX = currentWidth / 2;
-		float screenCenterY = (currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT) / 2;
-		
-		Vector3 corner1 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE, screenCenterY - Constants.HALF_CAR_SIZE, 0);
-		Vector3 corner2 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE, screenCenterY + Constants.HALF_CAR_SIZE, 0);
-		Vector3 corner3 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE, screenCenterY + Constants.HALF_CAR_SIZE, 0);
-		Vector3 corner4 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE, screenCenterY - Constants.HALF_CAR_SIZE, 0);
-		
-		camera.unproject(corner1);
-		camera.unproject(corner2);
-		camera.unproject(corner3);
-		camera.unproject(corner4);
-		
-		meshBuilder.rect(
-				corner1, 
-				corner2, 
-				corner3,
-				corner4, 
-				null);
-		myCar = meshBuilder.end();
-		// End construct car
-		
-		myCar.render(GL10.GL_TRIANGLES);
-	}
-	
-	private void renderMouseMarker() {
-		
-		int markerX = Math.round(mouseWorldPos.x / Constants.MAP_CELL_STEP);
-		int markerY = Math.round(mouseWorldPos.y / Constants.MAP_CELL_STEP);
-		
-		markerScreenPos = new Vector3(markerX * Constants.MAP_CELL_STEP, markerY * Constants.MAP_CELL_STEP, 0);
-		camera.project(markerScreenPos);
-		
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		// Begin construct select marker
-		shapeRenderer.begin(ShapeType.Filled);
-		shapeRenderer.setColor(Color.MAGENTA);
-		shapeRenderer.circle(markerScreenPos.x + cameraTranslationSteps.x, markerScreenPos.y + cameraTranslationSteps.y, 5);
-		shapeRenderer.end();
-	}
-	
-	private void renderCarSelectBox() {
-		if (!isCarSelected) {
-			return;
-		}
-		
-		float screenCenterX = currentWidth / 2;
-		float screenCenterY = (currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT) / 2;
-		
-		// Begin construct car select box
-		meshBuilder.begin(VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Color, GL10.GL_TRIANGLES);
-		meshBuilder.setColor(Color.RED);
-		
-		Vector3 corner1 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT, screenCenterY - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT, 0);
-		Vector3 corner2 = new Vector3(screenCenterX - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT , screenCenterY + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, 0);
-		Vector3 corner3 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, screenCenterY + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, 0);
-		Vector3 corner4 = new Vector3(screenCenterX + Constants.HALF_CAR_SIZE + Constants.CAR_SELECT_BORDER_WEIGHT, screenCenterY - Constants.HALF_CAR_SIZE - Constants.CAR_SELECT_BORDER_WEIGHT, 0);
-		
-		camera.unproject(corner1);
-		camera.unproject(corner2);
-		camera.unproject(corner3);
-		camera.unproject(corner4);
-		
-		meshBuilder.rect(
-				corner1, 
-				corner2, 
-				corner3,
-				corner4, 
-				null);
-		
-		myCarSelectBox = meshBuilder.end();
-		// End construct car select box
-		
-		myCarSelectBox.render(GL10.GL_TRIANGLES);
-	}
-	
-	private void renderBottomToolsPanel() {
-		meshBuilder.begin(VertexAttributes.Usage.Position
-				| VertexAttributes.Usage.Color, GL10.GL_TRIANGLES);
-		meshBuilder.setColor(Color.LIGHT_GRAY);
-		
-		Vector3 corner1 = new Vector3(0, currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT, 0);
-		Vector3 corner2 = new Vector3(0, currentHeight, 0);
-		Vector3 corner3 = new Vector3(currentWidth, currentHeight, 0);
-		Vector3 corner4 = new Vector3(currentWidth, currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT, 0);
-		
-		camera.unproject(corner1);
-		camera.unproject(corner2);
-		camera.unproject(corner3);
-		camera.unproject(corner4);
-		
-		meshBuilder.rect(
-				corner1, 
-				corner2, 
-				corner3,
-				corner4, 
-				null);
-		bottomToolsPanel = meshBuilder.end();
-		
-		bottomToolsPanel.render(GL10.GL_TRIANGLES);
+		player.getRenderSurface().render(GL10.GL_TRIANGLES);
 	}
 	
 	private void renderGrid() {
 		if (!Constants.IS_DEBUG) {
 			return;
 		}
-		Gdx.gl.glEnable(GL10.GL_SCISSOR_TEST);
-		Gdx.gl.glScissor(0, (int) Constants.BOTTOM_TOOLS_PANEL_HEIGHT, currentWidth, (int) (currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT));
+//		Gdx.gl.glEnable(GL10.GL_SCISSOR_TEST);
+//		Gdx.gl.glScissor(0, (int) Constants.BOTTOM_TOOLS_PANEL_HEIGHT, currentWidth, (int) (currentHeight - Constants.BOTTOM_TOOLS_PANEL_HEIGHT));
 		
-		grid.render(GL10.GL_LINES);
+		grid.getRenderSurface().render(GL10.GL_LINES);
 		
-		Gdx.gl.glDisable(GL10.GL_SCISSOR_TEST);
+//		Gdx.gl.glDisable(GL10.GL_SCISSOR_TEST);
 	}
 
 	private void debug() {
@@ -378,14 +228,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 			debugBatch.setProjectionMatrix(camera.combined);
 			debugBatch.begin();
 			debugFont.draw(debugBatch, m.toString(), v.x, v.y);
-			
-			//m = new StringBuffer().append("Cursor at: ").append(this.markerScreenPos.x).append(", ").append(this.markerScreenPos.y);
-			
-			//debugFont.draw(debugBatch, m.toString(), v.x, v.y + b.height + 5);
-			
-			m = new StringBuffer().append("Cursor at: ").append(this.mouseWorldPos.x).append(", ").append(this.mouseWorldPos.y);
-			
-			debugFont.draw(debugBatch, m.toString(), v.x, v.y + b.height + 5);
 			
 			debugBatch.end();
 

@@ -2,7 +2,6 @@
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.glutils.ShapeRenderer"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Color"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.files.FileHandle"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.BitmapFont"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator"/>
@@ -20,9 +19,17 @@
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.g3d.utils.MeshBuilder"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector3"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.graphics.VertexAttributes.Usage"/>
-<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Mesh"/>
 <fullyQualifiedTypeName name="com.doublev.racing.debug.Grid"/>
 <fullyQualifiedTypeName name="com.doublev.racing.constants.Constants"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.scenes.scene2d.utils.ScissorStack"/>
 <fullyQualifiedTypeName name="com.badlogic.gdx.math.Matrix4"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Color"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.collision.BoundingBox"/>
+<fullyQualifiedTypeName name="com.doublev.racing.model.RaceTrack"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.math.Vector2"/>
+<fullyQualifiedTypeName name="com.doublev.racing.model.RaceTrack.Position"/>
+<fullyQualifiedTypeName name="com.badlogic.gdx.graphics.Mesh"/>
+<fullyQualifiedTypeName name="com.doublev.racing.model.Player"/>
+<fullyQualifiedTypeName name="com.doublev.racing.model.RenderedObject"/>
+<fullyQualifiedTypeName name="com.doublev.racing.model.Position"/>
 </qualifiedTypeNameHistroy>

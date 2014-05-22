@@ -14,5 +14,5 @@ public class Constants {
 	public static final float BOTTOM_TOOLS_PANEL_HEIGHT = 40.0f;
 	
 	public static final float HALF_CAR_SIZE = 16.0f;
-	public static final float CAR_SELECT_BORDER_WEIGHT = 2.0f;
+	public static final float CAR_SIZE = 32.0f;
 }
