@@ -1,4 +1,4 @@
-package com.doublev.racing.model;
+package com.doublev.racing.render;
 
 import com.badlogic.gdx.graphics.Mesh;
 

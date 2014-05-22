@@ -1,4 +1,4 @@
-package com.doublev.racing.model;
+package com.doublev.racing.render;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.doublev.racing.constants.Constants;
+import com.doublev.racing.model.Position;
 
 public class Player implements RenderedObject {
 	private final Color color = Color.ORANGE;
@@ -35,7 +36,7 @@ public class Player implements RenderedObject {
 		return meshBuilder.end();
 	}
 	
-	public void updatePosition(Position position) {
+	public void setPosition(Position position) {
 		this.position = position;
 	}
 	

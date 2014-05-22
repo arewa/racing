@@ -8,14 +8,28 @@ public class RaceTrack {
 	public static short EMPTY = 0;
 	
 	public int[][] trackData;
-	public Position trackSize;
+	public int width;
+	public int height;
 	
 	public void init(int i, int j) {
-		this.trackSize = new Position(i, j);
+		this.width = i;
+		this.height = j;
 		this.trackData = new int[i][j];
+		
+		// Manually init walls
+		this.trackData[0][0] = WALL;
+		this.trackData[0][2] = WALL;
+		this.trackData[0][5] = WALL;
+		this.trackData[2][5] = WALL;
+		this.trackData[1][0] = WALL;
+		this.trackData[2][2] = WALL;
 	}
 	
 	public void updatePlayerPosition(Position pos) {
 		trackData[pos.i][pos.j] = PLAYER;
+	}
+	
+	public void updateEnemyPosition(Position pos) {
+		trackData[pos.i][pos.j] = ENEMY;
 	}
 }

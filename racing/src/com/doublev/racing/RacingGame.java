@@ -18,15 +18,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.doublev.racing.constants.Constants;
 import com.doublev.racing.debug.Grid;
-import com.doublev.racing.model.Player;
 import com.doublev.racing.model.Position;
 import com.doublev.racing.model.RaceTrack;
+import com.doublev.racing.render.Enemy;
+import com.doublev.racing.render.Player;
+import com.doublev.racing.render.Wall;
 
 public class RacingGame implements ApplicationListener, InputProcessor {
 
 	private OrthographicCamera camera;
 	private Grid grid;
-	private Player player;
 	
 	private ShapeRenderer shapeRenderer;
 	
@@ -43,7 +44,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	@Override
 	public void create() {
 		grid = new Grid();
-		player = new Player();
 
 		Texture texture = new Texture(
 				Gdx.files.internal(Constants.DEBUG_FONT_PNG), true);
@@ -78,7 +78,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 		renderGrid();
 		
-		renderCar();
+		renderRaceTrack();
 
 		debug();
 
@@ -187,11 +187,27 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		return false;
 	}
 	
-	private void renderCar() {
-		player.updatePosition(new Position(1, 1));
-		raceTrack.updatePlayerPosition(player.getPosition());
+	private void renderRaceTrack() {
+		raceTrack.updatePlayerPosition(new Position(1, 1));
+		raceTrack.updateEnemyPosition(new Position(3, 3));
 		
-		player.getRenderSurface().render(GL10.GL_TRIANGLES);
+		for (int i = 0; i < raceTrack.width; i ++) {
+			for (int j = 0; j < raceTrack.height; j ++) {
+				if (raceTrack.trackData[i][j] == RaceTrack.PLAYER) {
+					Player player = new Player();
+					player.setPosition(new Position(i, j));
+					player.getRenderSurface().render(GL10.GL_TRIANGLES);
+				} else if (raceTrack.trackData[i][j] == RaceTrack.WALL) {
+					Wall wall = new Wall();
+					wall.setPosition(new Position(i, j));
+					wall.getRenderSurface().render(GL10.GL_TRIANGLES);
+				} else if (raceTrack.trackData[i][j] == RaceTrack.ENEMY) {
+					Enemy enemy = new Enemy();
+					enemy.setPosition(new Position(i, j));
+					enemy.getRenderSurface().render(GL10.GL_TRIANGLES);
+				}
+			}
+		}
 	}
 	
 	private void renderGrid() {
