@@ -189,10 +189,10 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	}
 	
 	private void renderRaceTrack() {
-		raceData.updatePlayerPosition(new Position(5, 5));
+		raceData.updatePlayerPosition(new Position(8, 8));
 		raceData.updateEnemyPosition(new Position(3, 3));
 		
-		raceData.playerSpeed = 3;
+		raceData.playerSpeed = 1;
 		
 		raceData.update();
 		

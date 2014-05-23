@@ -13,6 +13,7 @@ public class RaceData {
 	public int trackHeight;
 	
 	public int playerSpeed = 1;
+	public Position playerPosition;
 	
 	public void init(int i, int j) {
 		this.trackWidth = i;
@@ -29,38 +30,56 @@ public class RaceData {
 	}
 	
 	public void updatePlayerPosition(Position pos) {
-		trackData[pos.i][pos.j] = PLAYER;
+		this.trackData[pos.i][pos.j] = PLAYER;
+		this.playerPosition = pos;
 	}
 	
 	public void updateEnemyPosition(Position pos) {
-		trackData[pos.i][pos.j] = ENEMY;
+		this.trackData[pos.i][pos.j] = ENEMY;
 	}
 	
 	public void update() {
-		for (int i = 0; i < trackWidth; i ++) {
-			for (int j = 0; j < trackHeight; j ++) {
-				if (trackData[i][j] == RaceData.PLAYER) {
-					for (int k = i - playerSpeed; k <= i + playerSpeed; k ++) {
-						for (int n = j - playerSpeed; n <= j + playerSpeed; n ++) {
-							if ((k == i) && (n == j)) {
-								continue;
-							}
-							
-							if ((k + n) % 2 == 0 || (k == i) || (n == j) || (k == n)) {
-								trackData[k][n] = NEXT_TURN;
-							}
-							
-//							if ((k == i) || (n == j) || (k == n)) {
-//								trackData[k][n] = NEXT_TURN;
-//							}
-//							
-//							if (k == i + playerSpeed) {
-//								trackData[k][n] = NEXT_TURN;
-//							}
-						}
-					}
+		
+		int x1 = playerPosition.i + playerSpeed - 1;
+		int x2 = playerPosition.i - playerSpeed + 1;
+		int y1 = playerPosition.j + playerSpeed - 1;
+		int y2 = playerPosition.j - playerSpeed + 1;
+
+		for (int i = 0; i < 3; i ++) {
+			int t1 = y1 + i;
+			int t2 = y2 - i;
+			int t3 = x1 + i;
+			int t4 = x2 - i;			
+
+			if (t1 < trackHeight) {
+				trackData[playerPosition.i][t1] = NEXT_TURN;
+				if (t3 < trackWidth) {
+					trackData[t3][t1] = NEXT_TURN;
+				}
+				if (t4 >= 0) {
+					trackData[t4][t1] = NEXT_TURN;
 				}
 			}
+
+			if (t3 < trackWidth) {
+				trackData[t3][playerPosition.j] = NEXT_TURN;
+				if (t2 >= 0) {
+					trackData[t3][t2] = NEXT_TURN;
+				}
+			}
+
+			if (t4 >= 0) {
+				trackData[t4][playerPosition.j] = NEXT_TURN;
+				if (t2 >= 0) {
+					trackData[t4][t2] = NEXT_TURN;
+				}
+			}
+
+			if (t2 >= 0) {
+				trackData[playerPosition.i][t2] = NEXT_TURN;
+			}
 		}
+		
+		trackData[playerPosition.i][playerPosition.j] = PLAYER;
 	}
 }
