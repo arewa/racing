@@ -174,7 +174,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		
 		if (raceData.isTurnAvaiable(turn)) {
 			raceData.updatePlayerPosition(turn);
-			System.out.println(raceData.playerSpeed);
 		}
 		return false;
 	}
