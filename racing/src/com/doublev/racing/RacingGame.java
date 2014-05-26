@@ -59,6 +59,8 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		
 		raceData = new RaceData();
 		raceData.init(10, 32);
+		raceData.updatePlayerPosition(new Position(5, 5));
+		raceData.updateEnemyPosition(new Position(3, 3));
 
 		Gdx.input.setInputProcessor(this);
 	}
@@ -165,6 +167,15 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 
 	@Override
 	public boolean touchDown(int x, int y, int pointer, int button) {
+		Vector3 point = new Vector3(x, y, 0);
+		camera.unproject(point);
+		
+		Position turn = new Position((int)(point.x / Constants.MAP_CELL_SIZE), (int)(point.y / Constants.MAP_CELL_SIZE));
+		
+		if (raceData.isTurnAvaiable(turn)) {
+			raceData.updatePlayerPosition(turn);
+			System.out.println(raceData.playerSpeed);
+		}
 		return false;
 	}
 
@@ -189,10 +200,6 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 	}
 	
 	private void renderRaceTrack() {
-		raceData.updatePlayerPosition(new Position(8, 8));
-		raceData.updateEnemyPosition(new Position(3, 3));
-		
-		raceData.playerSpeed = 1;
 		
 		raceData.update();
 		
@@ -238,9 +245,10 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 			Gdx.gl10.glEnable(GL10.GL_ALPHA_TEST);
 			Gdx.gl10.glAlphaFunc(GL10.GL_GREATER, 0.5f);
 			
-			StringBuffer m = new StringBuffer().append("FPS: ")
-					.append(Gdx.graphics.getFramesPerSecond()).append(", w = ")
-					.append(currentWidth).append(", h = ").append(currentHeight);
+			StringBuilder m = new StringBuilder().append("FPS: ")
+					.append(Gdx.graphics.getFramesPerSecond());
+//					.append(", w = ")
+//					.append(currentWidth).append(", h = ").append(currentHeight);
 
 			TextBounds b = debugFont.getBounds(m.toString());
 			Vector3 v = new Vector3(currentWidth - b.width - 5, currentHeight
