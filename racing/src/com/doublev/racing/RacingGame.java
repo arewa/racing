@@ -59,7 +59,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		
 		raceData = new RaceData();
 		raceData.init(10, 32);
-		raceData.updatePlayerPosition(new Position(5, 5));
+		raceData.updatePlayerPosition(new Position(6, 6));
 		raceData.updateEnemyPosition(new Position(3, 3));
 
 		Gdx.input.setInputProcessor(this);
@@ -173,6 +173,7 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 		Position turn = new Position((int)(point.x / Constants.MAP_CELL_SIZE), (int)(point.y / Constants.MAP_CELL_SIZE));
 		
 		if (raceData.isTurnAvaiable(turn)) {
+			raceData.resetPlayerPosition();
 			raceData.updatePlayerPosition(turn);
 		}
 		return false;
@@ -258,6 +259,10 @@ public class RacingGame implements ApplicationListener, InputProcessor {
 			debugBatch.begin();
 			debugFont.draw(debugBatch, m.toString(), v.x, v.y);
 			
+			v = new Vector3(15, currentHeight - b.height - 5, 0.0f);
+			camera.unproject(v);
+			m = new StringBuilder().append(raceData.playerSpeed);
+			debugFont.draw(debugBatch, m.toString(), v.x, v.y);
 			debugBatch.end();
 
 			debugBatch.flush();

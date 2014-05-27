@@ -3,6 +3,15 @@ package com.doublev.racing.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.doublev.racing.model.impl.Direction1;
+import com.doublev.racing.model.impl.Direction2;
+import com.doublev.racing.model.impl.Direction3;
+import com.doublev.racing.model.impl.Direction4;
+import com.doublev.racing.model.impl.Direction5;
+import com.doublev.racing.model.impl.Direction6;
+import com.doublev.racing.model.impl.Direction7;
+import com.doublev.racing.model.impl.Direction8;
+
 public class RaceData {
 	
 	public static short PLAYER = 2;
@@ -18,19 +27,30 @@ public class RaceData {
 	public int playerSpeed = 1;
 	public Position playerPosition;
 	public List<Position> availableTurns = new ArrayList<Position>();
+	public List<Direction> directions = new ArrayList<Direction>();
 	
 	public void init(int i, int j) {
 		this.trackWidth = i;
 		this.trackHeight = j;
 		this.trackData = new int[i][j];
 		
+		// Init directions
+		directions.add(new Direction1());
+		directions.add(new Direction2());
+		directions.add(new Direction3());
+		directions.add(new Direction4());
+		directions.add(new Direction5());
+		directions.add(new Direction6());
+		directions.add(new Direction7());
+		directions.add(new Direction8());
+		
 		// Manually init walls
-//		this.trackData[0][0] = WALL;
-//		this.trackData[0][2] = WALL;
-//		this.trackData[0][5] = WALL;
-//		this.trackData[2][5] = WALL;
-//		this.trackData[1][0] = WALL;
-//		this.trackData[2][2] = WALL;
+		this.trackData[0][0] = WALL;
+		this.trackData[0][2] = WALL;
+		this.trackData[0][5] = WALL;
+		this.trackData[2][5] = WALL;
+		this.trackData[1][0] = WALL;
+		this.trackData[2][2] = WALL;
 	}
 	
 	public void updatePlayerPosition(Position pos) {
@@ -48,7 +68,16 @@ public class RaceData {
 		if (playerPosition == null) {
 			return;
 		}
+
+		for (Direction d : directions) {
+			d.updateRaceData(this);
+			d.computeAvailableForTurn(playerPosition);
+		}
 		
+		trackData[playerPosition.i][playerPosition.j] = PLAYER;
+	}
+	
+	public void resetPlayerPosition() {
 		for (int i = 0; i < trackWidth; i ++) {
 			for (int j = 0; j < trackHeight; j ++) {
 				if ((trackData[i][j] == PLAYER) || (trackData[i][j] == NEXT_TURN)) {
@@ -58,60 +87,6 @@ public class RaceData {
 		}
 		
 		availableTurns.clear();
-		
-		int x1 = playerPosition.i + playerSpeed - 1;
-		int x2 = playerPosition.i - playerSpeed + 1;
-		int y1 = playerPosition.j + playerSpeed - 1;
-		int y2 = playerPosition.j - playerSpeed + 1;
-
-		for (int i = 0; i < 3; i ++) {
-			int t1 = y1 + i;
-			int t2 = y2 - i;
-			int t3 = x1 + i;
-			int t4 = x2 - i;			
-
-			if (t1 < trackHeight) {
-				
-				trackData[playerPosition.i][t1] = NEXT_TURN;
-				addAvaiableTurn(new Position(playerPosition.i, t1));
-				
-				if (t3 < trackWidth) {
-					trackData[t3][t1] = NEXT_TURN;
-					addAvaiableTurn(new Position(t3, t1));
-				}
-				if (t4 >= 0) {
-					trackData[t4][t1] = NEXT_TURN;
-					addAvaiableTurn(new Position(t4, t1));
-				}
-			}
-
-			if (t3 < trackWidth) {
-				trackData[t3][playerPosition.j] = NEXT_TURN;
-				addAvaiableTurn(new Position(t3, playerPosition.j));
-				
-				if (t2 >= 0) {
-					trackData[t3][t2] = NEXT_TURN;
-					addAvaiableTurn(new Position(t3, t2));
-				}
-			}
-
-			if (t4 >= 0) {
-				trackData[t4][playerPosition.j] = NEXT_TURN;
-				addAvaiableTurn(new Position(t4, playerPosition.j));
-				
-				if (t2 >= 0) {
-					trackData[t4][t2] = NEXT_TURN;
-					addAvaiableTurn(new Position(t4, t2));
-				}
-			}
-
-			if (t2 >= 0) {
-				trackData[playerPosition.i][t2] = NEXT_TURN;
-				addAvaiableTurn(new Position(playerPosition.i, t2));
-			}
-		}
-		
-		trackData[playerPosition.i][playerPosition.j] = PLAYER;
 	}
 	
 	public boolean isTurnAvaiable(Position turn) {
@@ -144,11 +119,11 @@ public class RaceData {
 		}
 	}
 	
-	private void addAvaiableTurn(Position turn) {
+	public void addAvaiableTurn(Position turn) {
 		if (turn.equals(playerPosition)) {
 			return;
 		}
-		
+		trackData[turn.i][turn.j] = NEXT_TURN;
 		availableTurns.add(turn);
 	}
 }
