@@ -6,6 +6,9 @@ public class Constants {
 	public static final String DEBUG_FONT_PNG = "data/font/myfont1.png";
 	public static final String DEBUG_FONT_FNT = "data/font/myfont1.fnt";
 	
+	public static final String FONT1_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.:;,{}\"´`'<>";
+	public static final String FONT1_TTF = "data/font/russoone.ttf";
+	
 	public static final float MAP_WIDTH = 320.0f;
 	public static final float MAP_HEIGHT = 1024.0f;
 	public static final float MAP_CELL_SIZE = 32.0f;
