@@ -103,6 +103,14 @@ public class RaceData {
 			return;
 		}
 		
+		if (turn.equals(enemyPosition)) {
+			return;
+		}
+		
+		if (availableTurns.contains(turn)) {
+			return;
+		}
+		
 		availableTurns.add(turn);
 	}
 	
