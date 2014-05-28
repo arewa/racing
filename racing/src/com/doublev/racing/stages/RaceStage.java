@@ -30,14 +30,15 @@ public class RaceStage extends Stage {
 	private OpponentCar opponentCar;
 	private AreaAvailableForTurn areaAvailableForTurn;
 	private Walls walls;
+	
+	private Vector2 touchPoint;
 
 	public RaceStage(ScreenViewport screenViewport) {
 		
 		super(screenViewport);
 		
 		raceData = new RaceData();
-		raceData.init(10, 32);
-		raceData.loadTrack("data/track/1");
+		raceData.init(Constants.TRACK1_FILE);
 		
 		track = new Track();
 		LabelStyle labelStyle = new LabelStyle();
@@ -71,19 +72,25 @@ public class RaceStage extends Stage {
 
 			@Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				touchPoint = new Vector2(x, y);
 				
-				Vector2 point = new Vector2(x, y);
-				//screenToStageCoordinates(point);
-				
-				Cell turn = new Cell((int)(point.x / Constants.MAP_CELL_SIZE), (int)(point.y / Constants.MAP_CELL_SIZE));
+    			return true;
+            }
+
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				Cell turn = new Cell((int)(touchPoint.x / Constants.MAP_CELL_SIZE), (int)(touchPoint.y / Constants.MAP_CELL_SIZE));
 				
 				if (raceData.isTurnAvaiable(turn)) {
 					raceData.resetPlayerPosition();
 					raceData.updatePlayerPosition(turn);
 				}
-    			return true;
-            };
-            
+			}
+
+			@Override
+			public void touchDragged(InputEvent event, float x, float y, int pointer) {
+				getCamera().translate(touchPoint.x - x, touchPoint.y - y, 0);
+			};
             
 		});
 	}

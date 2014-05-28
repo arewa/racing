@@ -28,10 +28,7 @@ public class RaceData {
 	public List<Cell> walls = new ArrayList<Cell>();
 	public List<Direction> directions = new ArrayList<Direction>();
 	
-	public void init(int i, int j) {
-		this.trackWidth = i;
-		this.trackHeight = j;
-		
+	public void init(String trackFile) {
 		// Init directions
 		directions.add(new Direction1());
 		directions.add(new Direction2());
@@ -41,6 +38,8 @@ public class RaceData {
 		directions.add(new Direction6());
 		directions.add(new Direction7());
 		directions.add(new Direction8());
+		
+		loadTrack(trackFile);
 	}
 	
 	public void updatePlayerPosition(Cell pos) {
@@ -114,14 +113,23 @@ public class RaceData {
 		availableTurns.add(turn);
 	}
 	
-	public void loadTrack(String trackFile) {
+	private void loadTrack(String trackFile) {
 		FileHandle fh = Gdx.files.internal(trackFile);
 		BufferedReader r = new BufferedReader(fh.reader());
 		String strLine;
+		String[] line;
 		int col, row = 0;
+		
 		try {
+			// Init track size (first line in file)
+			strLine = r.readLine();
+			line = strLine.split(" ");
+			
+			trackWidth = new Integer(line[0]).intValue();
+			trackHeight = new Integer(line[1]).intValue();
+		
 			while ((strLine = r.readLine()) != null)   {
-				String[] line = strLine.split(" ");
+				line = strLine.split(" ");
 				col = 0;
 				for (String s : line) {
 					int ti = col;
