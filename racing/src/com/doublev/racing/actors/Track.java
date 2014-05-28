@@ -7,13 +7,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.doublev.racing.constants.Constants;
+import com.doublev.racing.model.RaceData;
 
 public class Track extends Actor {
 
 	private ShapeRenderer renderer;
+	private RaceData raceData;
 
-	public Track() {
+	public Track(RaceData raceData) {
 		renderer = new ShapeRenderer();
+		this.raceData = raceData;
 	}
 
 	@Override
@@ -26,16 +29,19 @@ public class Track extends Actor {
 		renderer.setColor(Color.GREEN);
 
 		renderer.begin(ShapeType.Line);
+		
+		float maxWidth = raceData.trackWidth * Constants.MAP_CELL_SIZE;
+		float maxHeight = raceData.trackHeight * Constants.MAP_CELL_SIZE;
 
-		for (float u = 0.0f; u <= Constants.MAP_WIDTH; u += Constants.MAP_CELL_SIZE) {
+		for (float u = 0.0f; u <= maxWidth; u += Constants.MAP_CELL_SIZE) {
 			Vector3 from = new Vector3(u, 0.0f, 0.0f);
-			Vector3 to = new Vector3(u, Constants.MAP_HEIGHT, 0.0f);
+			Vector3 to = new Vector3(u, maxHeight, 0.0f);
 			renderer.line(from, to);
 		}
 
-		for (float u = 0.0f; u <= Constants.MAP_HEIGHT; u += Constants.MAP_CELL_SIZE) {
+		for (float u = 0.0f; u <= maxHeight; u += Constants.MAP_CELL_SIZE) {
 			Vector3 from = new Vector3(0.0f, u, 0.0f);
-			Vector3 to = new Vector3(Constants.MAP_WIDTH, u, 0.0f);
+			Vector3 to = new Vector3(maxWidth, u, 0.0f);
 			renderer.line(from, to);
 		}
 

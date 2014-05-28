@@ -40,7 +40,7 @@ public class RaceStage extends Stage {
 		raceData = new RaceData();
 		raceData.init(Constants.TRACK1_FILE);
 		
-		track = new Track();
+		track = new Track(raceData);
 		LabelStyle labelStyle = new LabelStyle();
 		labelStyle.font = FontHelper.getFont();
 		
@@ -90,7 +90,7 @@ public class RaceStage extends Stage {
 			@Override
 			public void touchDragged(InputEvent event, float x, float y, int pointer) {
 				getCamera().translate(touchPoint.x - x, touchPoint.y - y, 0);
-			};
+			}
             
 		});
 	}
