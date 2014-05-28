@@ -70,7 +70,7 @@ public class RaceStage extends Stage {
 		opponentAreaAvailableForTurn = new AreaAvailableForTurn(Color.TEAL);
 		opponentAreaAvailableForTurn.setAvailableTurns(raceData.opponentAvailableTurns);
 		
-		opponentAreaAvailableForTurn.setVisible(false);
+		opponentAreaAvailableForTurn.setVisible(true);
 		
 		walls = new Walls();
 		walls.setWalls(raceData.walls);
@@ -151,7 +151,7 @@ public class RaceStage extends Stage {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-
+		
 		fpsLabel.setText(new StringBuilder().append("fps: ").append(Gdx.graphics.getFramesPerSecond()).toString());
 	}
 }
