@@ -2,6 +2,7 @@ package com.doublev.racing.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -28,7 +29,9 @@ public class RaceStage extends Stage {
 	private RaceData raceData;
 	private PlayerCar playerCar;
 	private OpponentCar opponentCar;
-	private AreaAvailableForTurn areaAvailableForTurn;
+	private AreaAvailableForTurn playerAreaAvailableForTurn;
+	private AreaAvailableForTurn opponentAreaAvailableForTurn;
+	
 	private Walls walls;
 	
 	private Vector2 touchPoint;
@@ -39,6 +42,7 @@ public class RaceStage extends Stage {
 		
 		raceData = new RaceData();
 		raceData.init(Constants.TRACK1_FILE);
+		raceData.update(raceData.playerPosition);
 		
 		track = new Track(raceData);
 		LabelStyle labelStyle = new LabelStyle();
@@ -52,19 +56,26 @@ public class RaceStage extends Stage {
 		
 		playerCar = new PlayerCar();
 		playerCar.setCell(raceData.playerPosition);
+		playerAreaAvailableForTurn = new AreaAvailableForTurn(Color.LIGHT_GRAY);
+		playerAreaAvailableForTurn.setAvailableTurns(raceData.availableTurns);
 		
 		opponentCar = new OpponentCar();
-		opponentCar.setCell(raceData.enemyPosition);
+		opponentCar.setCell(raceData.opponentPosition);
+		opponentAreaAvailableForTurn = new AreaAvailableForTurn(Color.TEAL);
+		opponentAreaAvailableForTurn.setAvailableTurns(raceData.opponentAvailableTurns);
 		
-		areaAvailableForTurn = new AreaAvailableForTurn();
 		walls = new Walls();
 		walls.setWalls(raceData.walls);
 		
 		addActor(track);
 		addActor(walls);
-		addActor(areaAvailableForTurn);
-		addActor(playerCar);
+		
+		addActor(opponentAreaAvailableForTurn);
 		addActor(opponentCar);
+		
+		addActor(playerAreaAvailableForTurn);
+		addActor(playerCar);
+		
 		addActor(fpsLabel);
 		addActor(speedLabel);
 		
@@ -82,8 +93,15 @@ public class RaceStage extends Stage {
 				Cell turn = new Cell((int)(touchPoint.x / Constants.MAP_CELL_SIZE), (int)(touchPoint.y / Constants.MAP_CELL_SIZE));
 				
 				if (raceData.isTurnAvaiable(turn)) {
-					raceData.resetPlayerPosition();
-					raceData.updatePlayerPosition(turn);
+					raceData.update(turn);
+					
+					playerAreaAvailableForTurn.setAvailableTurns(raceData.availableTurns);
+					playerCar.setCell(raceData.playerPosition);
+					
+					opponentAreaAvailableForTurn.setAvailableTurns(raceData.opponentAvailableTurns);
+					opponentCar.setCell(raceData.opponentPosition);
+					
+					speedLabel.setText(new StringBuilder().append("speed: ").append(raceData.playerSpeed).toString());
 				}
 			}
 
@@ -123,13 +141,7 @@ public class RaceStage extends Stage {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		
-		raceData.update();
-		
-		areaAvailableForTurn.setAvaiableTurns(raceData.availableTurns);
-		playerCar.setCell(raceData.playerPosition);
-		
-		speedLabel.setText(new StringBuilder().append("speed: ").append(raceData.playerSpeed).toString());
+
 		fpsLabel.setText(new StringBuilder().append("fps: ").append(Gdx.graphics.getFramesPerSecond()).toString());
 	}
 }

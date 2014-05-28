@@ -13,14 +13,16 @@ import com.doublev.racing.model.Cell;
 
 public class AreaAvailableForTurn extends Actor {
 	private ShapeRenderer renderer;
-	private List<Cell> avaiableTurns = new ArrayList<Cell>();
+	private List<Cell> availableTurns = new ArrayList<Cell>();
+	private Color color;
 
-	public AreaAvailableForTurn() {
-		renderer = new ShapeRenderer();
+	public AreaAvailableForTurn(Color color) {
+		this.renderer = new ShapeRenderer();
+		this.color = color;
 	}
 	
-	public void setAvaiableTurns(List<Cell> avaiableTurns) {
-		this.avaiableTurns = avaiableTurns;
+	public void setAvailableTurns(List<Cell> availableTurns) {
+		this.availableTurns = availableTurns;
 	}
 
 	@Override
@@ -30,11 +32,11 @@ public class AreaAvailableForTurn extends Actor {
 		renderer.setProjectionMatrix(batch.getProjectionMatrix());
 		renderer.setTransformMatrix(batch.getTransformMatrix());
 		renderer.translate(getX(), getY(), 0);
-		renderer.setColor(Color.LIGHT_GRAY);
+		renderer.setColor(color);
 
 		renderer.begin(ShapeType.Filled);
 		
-		for (Cell cell : avaiableTurns) {
+		for (Cell cell : availableTurns) {
 			renderer.rect(cell.i * Constants.CAR_SIZE, cell.j * Constants.CAR_SIZE, Constants.CAR_SIZE, Constants.CAR_SIZE);
 		}
 

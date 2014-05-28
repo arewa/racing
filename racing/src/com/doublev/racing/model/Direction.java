@@ -1,5 +1,8 @@
 package com.doublev.racing.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Direction {
 
 	private RaceData raceData;
@@ -7,41 +10,51 @@ public abstract class Direction {
 
 	protected abstract Cell computeNextPosition(Cell currentPosition);
 	
-	public void updateRaceData(RaceData raceData) {
+	public void updateRaceData(RaceData raceData, int maxHops) {
 		this.raceData = raceData;
-		this.maxHops = raceData.playerSpeed + 1;
+		this.maxHops = maxHops;
 	}
 
-	public void computeAvailableForTurn(Cell startPosition) {
+	public List<Cell> computeAvailableForTurn(Cell startPosition) {
+		List<Cell> avaiableTurns = new ArrayList<Cell>();
+		
 		if (maxHops == 0) {
-			return;
+			return avaiableTurns;
 		}
 
 		Cell nextPosition = computeNextPosition(startPosition);
 
 		if ((nextPosition.i < 0) || (nextPosition.i >= raceData.trackWidth)) {
-			return;
+			return avaiableTurns;
 		}
 
 		if ((nextPosition.j < 0) || (nextPosition.j >= raceData.trackHeight)) {
-			return;
+			return avaiableTurns;
 		}
 		
 		if (nextPosition.equals(raceData.playerPosition)) {
-			return;
+			return avaiableTurns;
+		}
+		
+		if (nextPosition.equals(raceData.opponentPosition)) {
+			return avaiableTurns;
 		}
 		
 		for (Cell w : raceData.walls) {
 			if (nextPosition.equals(w)) {
-				return;
+				return avaiableTurns;
 			}
 		}
 
 		if (maxHops <= 3) {
-			raceData.addAvaiableTurn(nextPosition);
+			if (!avaiableTurns.contains(nextPosition)) {
+				avaiableTurns.add(nextPosition);
+			}
 		}
 
 		maxHops --;
-		computeAvailableForTurn(nextPosition);
+		avaiableTurns.addAll(computeAvailableForTurn(nextPosition));
+		
+		return avaiableTurns;
 	}
 }

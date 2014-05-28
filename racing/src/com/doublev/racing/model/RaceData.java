@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -22,11 +23,18 @@ public class RaceData {
 	public int trackHeight;
 	
 	public int playerSpeed = 1;
+	public int opponentSpeed = 1;
+	
 	public Cell playerPosition;
-	public Cell enemyPosition;
+	public Cell opponentPosition;
+	
 	public List<Cell> availableTurns = new ArrayList<Cell>();
+	public List<Cell> opponentAvailableTurns = new ArrayList<Cell>();
+	
 	public List<Cell> walls = new ArrayList<Cell>();
 	public List<Direction> directions = new ArrayList<Direction>();
+	
+	private Random rand = new Random();
 	
 	public void init(String trackFile) {
 		// Init directions
@@ -47,24 +55,34 @@ public class RaceData {
 		this.playerPosition = pos;
 	}
 	
-	public void updateEnemyPosition(Cell pos) {
-		this.enemyPosition = pos;
+	public void updateOpponentPosition(Cell pos) {
+		updateOpponentSpeed(pos);
+		this.opponentPosition = pos;
 	}
 	
-	public void update() {
+	public void update(Cell turn) {
 		
 		if (playerPosition == null) {
 			return;
 		}
+		
+		computeOpponentTurn();
+		
+		resetPositions();
+		updatePlayerPosition(turn);
 
 		for (Direction d : directions) {
-			d.updateRaceData(this);
-			d.computeAvailableForTurn(playerPosition);
+			d.updateRaceData(this, playerSpeed + 1);
+			availableTurns.addAll(d.computeAvailableForTurn(playerPosition));
+			
+			d.updateRaceData(this, opponentSpeed + 1);
+			opponentAvailableTurns.addAll(d.computeAvailableForTurn(opponentPosition));
 		}
 	}
 	
-	public void resetPlayerPosition() {
+	public void resetPositions() {
 		availableTurns.clear();
+		opponentAvailableTurns.clear();
 	}
 	
 	public boolean isTurnAvaiable(Cell turn) {
@@ -97,20 +115,40 @@ public class RaceData {
 		}
 	}
 	
-	public void addAvaiableTurn(Cell turn) {
-		if (turn.equals(playerPosition)) {
+	private void updateOpponentSpeed(Cell turn) {
+		
+		if (opponentPosition == null) {
 			return;
 		}
 		
-		if (turn.equals(enemyPosition)) {
+		if (opponentPosition.j == turn.j) {
+			opponentSpeed = Math.abs(opponentPosition.i - turn.i);
+		} else if (playerPosition.i == turn.i) {
+			opponentSpeed = Math.abs(opponentPosition.j - turn.j);
+		} else {
+			opponentSpeed = Math.abs(opponentPosition.j - turn.j);
+		}
+		
+		if (opponentSpeed == 0) {
+			opponentSpeed = 1;
+		}
+	}
+	
+	private void computeOpponentTurn() {
+		if (opponentAvailableTurns.size() == 0) {
 			return;
 		}
 		
-		if (availableTurns.contains(turn)) {
-			return;
+		int t = 0;
+		Cell nextPosition = new Cell(0, 0);
+		for (Cell c : opponentAvailableTurns) {
+			if ((Math.abs(c.i - opponentPosition.i) + Math.abs(c.j - opponentPosition.j)) > t) {
+				t = c.i + c.j;
+				nextPosition = c;
+			}
 		}
 		
-		availableTurns.add(turn);
+		updateOpponentPosition(nextPosition);
 	}
 	
 	private void loadTrack(String trackFile) {
@@ -139,7 +177,7 @@ public class RaceData {
 					} else if ("*".equals(s)) {
 						playerPosition = new Cell(ti, tj);
 					} else if ("+".equals(s)) {
-						enemyPosition = new Cell(ti, tj);
+						opponentPosition = new Cell(ti, tj);
 					}
 					col ++;
 				}
