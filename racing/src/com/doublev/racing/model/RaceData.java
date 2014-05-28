@@ -1,8 +1,13 @@
 package com.doublev.racing.model;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.doublev.racing.constants.Constants;
 import com.doublev.racing.model.impl.Direction1;
 import com.doublev.racing.model.impl.Direction2;
 import com.doublev.racing.model.impl.Direction3;
@@ -36,14 +41,6 @@ public class RaceData {
 		directions.add(new Direction6());
 		directions.add(new Direction7());
 		directions.add(new Direction8());
-		
-		// Manually init walls
-		walls.add(new Cell(0, 0));
-		walls.add(new Cell(0, 2));
-		walls.add(new Cell(0, 5));
-		walls.add(new Cell(2, 5));
-		walls.add(new Cell(1, 0));
-		walls.add(new Cell(2, 2));
 	}
 	
 	public void updatePlayerPosition(Cell pos) {
@@ -107,5 +104,31 @@ public class RaceData {
 		}
 		
 		availableTurns.add(turn);
+	}
+	
+	public void loadTrack(String trackFile) {
+		FileHandle fh = Gdx.files.internal(trackFile);
+		BufferedReader r = new BufferedReader(fh.reader());
+		String strLine;
+		int col, row = 0;
+		try {
+			while ((strLine = r.readLine()) != null)   {
+				String[] line = strLine.split(" ");
+				col = 0;
+				for (String s : line) {
+					int ti = trackWidth - col - 1;
+					int tj = trackHeight - row - 1;
+					if ("-".equals(s) || "|".equals(s)) {
+						walls.add(new Cell(ti, tj));
+					} else if ("*".equals(s)) {
+						playerPosition = new Cell(ti, tj);
+					} else if ("+".equals(s)) {
+						enemyPosition = new Cell(ti, tj);
+					}
+					col ++;
+				}
+				row ++;
+			}
+		} catch (IOException e) {}
 	}
 }

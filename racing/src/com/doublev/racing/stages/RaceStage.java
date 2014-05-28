@@ -37,8 +37,7 @@ public class RaceStage extends Stage {
 		
 		raceData = new RaceData();
 		raceData.init(10, 32);
-		raceData.updatePlayerPosition(new Cell(6, 6));
-		raceData.updateEnemyPosition(new Cell(1, 1));
+		raceData.loadTrack("data/track/1");
 		
 		track = new Track();
 		LabelStyle labelStyle = new LabelStyle();
