@@ -66,10 +66,11 @@ public class RaceData {
 			return;
 		}
 		
+		updatePlayerPosition(turn);
+		
 		computeOpponentTurn();
 		
 		resetPositions();
-		updatePlayerPosition(turn);
 
 		for (Direction d : directions) {
 			d.updateRaceData(this, playerSpeed + 1);
@@ -139,16 +140,47 @@ public class RaceData {
 			return;
 		}
 		
-		int t = 0;
-		Cell nextPosition = new Cell(0, 0);
+		int minWallsAround = 99;
+		int maxJ = 0;
+		Cell newPosition = new Cell(0, 0);
 		for (Cell c : opponentAvailableTurns) {
-			if ((Math.abs(c.i - opponentPosition.i) + Math.abs(c.j - opponentPosition.j)) > t) {
-				t = c.i + c.j;
-				nextPosition = c;
+			for (Cell w : walls) {
+				int wallsAround = 0;
+				if ((w.i == c.i) && (w.j == (c.j + 1))) {
+					wallsAround ++;
+				} 
+				if ((w.i == (c.i + 1)) && (w.j == c.j)) {
+					wallsAround ++;
+				} 
+				if ((w.i == c.i) && (w.j == (c.j - 1))) {
+					wallsAround ++;
+				}
+				if ((w.i == (c.i - 1)) && (w.j == c.j)) {
+					wallsAround ++;
+				}
+				if ((w.i == (c.i + 1)) && (w.j == (c.j + 1))) {
+					wallsAround ++;
+				}
+				if ((w.i == (c.i + 1)) && (w.j == (c.j - 1))) {
+					wallsAround ++;
+				}
+				if ((w.i == (c.i - 1)) && (w.j == (c.j - 1))) {
+					wallsAround ++;
+				}
+				if ((w.i == (c.i - 1)) && (w.j == (c.j + 1))) {
+					wallsAround ++;
+				}
+				
+				if ((wallsAround <= minWallsAround) && (c.j >= maxJ) 
+						&& ((c.i != playerPosition.i) && (c.j != playerPosition.j))) {
+					minWallsAround = wallsAround;
+					maxJ = c.j;
+					newPosition = c;
+				}
 			}
 		}
 		
-		updateOpponentPosition(nextPosition);
+		updateOpponentPosition(newPosition);
 	}
 	
 	private void loadTrack(String trackFile) {

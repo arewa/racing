@@ -24,6 +24,7 @@ public class RaceStage extends Stage {
 	
 	private Track track;
 	private Label speedLabel;
+	private Label opponentSpeedLabel;
 	private Label fpsLabel;
 	
 	private RaceData raceData;
@@ -52,7 +53,12 @@ public class RaceStage extends Stage {
 		fpsLabel.setPosition(getViewport().getViewportWidth() - 60, 10);
 		
 		speedLabel = new Label("", labelStyle);
-		speedLabel.setPosition(10, 10);
+		speedLabel.setPosition(5, 10);
+		speedLabel.setText(new StringBuilder().append("speed: ").append(raceData.playerSpeed).toString());
+		
+		opponentSpeedLabel = new Label("", labelStyle);
+		opponentSpeedLabel.setPosition(90, 10);
+		opponentSpeedLabel.setText(new StringBuilder().append("opp speed: ").append(raceData.opponentSpeed).toString());
 		
 		playerCar = new PlayerCar();
 		playerCar.setCell(raceData.playerPosition);
@@ -64,6 +70,8 @@ public class RaceStage extends Stage {
 		opponentAreaAvailableForTurn = new AreaAvailableForTurn(Color.TEAL);
 		opponentAreaAvailableForTurn.setAvailableTurns(raceData.opponentAvailableTurns);
 		
+		opponentAreaAvailableForTurn.setVisible(false);
+		
 		walls = new Walls();
 		walls.setWalls(raceData.walls);
 		
@@ -71,13 +79,14 @@ public class RaceStage extends Stage {
 		addActor(walls);
 		
 		addActor(opponentAreaAvailableForTurn);
-		addActor(opponentCar);
-		
 		addActor(playerAreaAvailableForTurn);
+		
+		addActor(opponentCar);
 		addActor(playerCar);
 		
 		addActor(fpsLabel);
 		addActor(speedLabel);
+		addActor(opponentSpeedLabel);
 		
 		addListener(new ClickListener() {
 
@@ -102,6 +111,7 @@ public class RaceStage extends Stage {
 					opponentCar.setCell(raceData.opponentPosition);
 					
 					speedLabel.setText(new StringBuilder().append("speed: ").append(raceData.playerSpeed).toString());
+					opponentSpeedLabel.setText(new StringBuilder().append("opp speed: ").append(raceData.opponentSpeed).toString());
 				}
 			}
 

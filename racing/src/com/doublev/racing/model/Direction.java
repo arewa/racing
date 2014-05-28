@@ -23,14 +23,6 @@ public abstract class Direction {
 		}
 
 		Cell nextPosition = computeNextPosition(startPosition);
-
-		if ((nextPosition.i < 0) || (nextPosition.i >= raceData.trackWidth)) {
-			return avaiableTurns;
-		}
-
-		if ((nextPosition.j < 0) || (nextPosition.j >= raceData.trackHeight)) {
-			return avaiableTurns;
-		}
 		
 		if (nextPosition.equals(raceData.playerPosition)) {
 			return avaiableTurns;
@@ -44,6 +36,18 @@ public abstract class Direction {
 			if (nextPosition.equals(w)) {
 				return avaiableTurns;
 			}
+		}
+		
+		if ((nextPosition.i < 0) || (nextPosition.i >= raceData.trackWidth)) {
+			return avaiableTurns;
+		}
+
+		if ((nextPosition.j < 0)) {
+			return avaiableTurns;
+		}
+		
+		if (nextPosition.j >= raceData.trackHeight) {
+			nextPosition.j = raceData.trackHeight - 1;
 		}
 
 		if (maxHops <= 3) {
