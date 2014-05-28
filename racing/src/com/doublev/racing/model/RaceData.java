@@ -116,7 +116,7 @@ public class RaceData {
 				String[] line = strLine.split(" ");
 				col = 0;
 				for (String s : line) {
-					int ti = trackWidth - col - 1;
+					int ti = col;
 					int tj = trackHeight - row - 1;
 					if ("-".equals(s) || "|".equals(s)) {
 						walls.add(new Cell(ti, tj));
