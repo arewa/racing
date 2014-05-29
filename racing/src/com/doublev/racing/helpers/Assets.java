@@ -7,21 +7,21 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.doublev.racing.constants.Constants;
 
-public class FontHelper {
+public class Assets {
+	public static BitmapFont fontOrange;
+	public static BitmapFont fontGreen;
 	
-	private static BitmapFont font;
-	
-	public static void init(int fontSize) {
+	public static void load() {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Constants.FONT1_TTF));
 		FreeTypeFontParameter param = new FreeTypeFontParameter();
 		param.size = 15;
 		param.characters = Constants.FONT1_CHARACTERS;
-		font = generator.generateFont(param);
-        font.setColor(Color.WHITE);
+		fontOrange = generator.generateFont(param);
+		fontOrange.setColor(Color.ORANGE);
+		
+		fontGreen = generator.generateFont(param);
+		fontGreen.setColor(Color.GREEN);
+		
         generator.dispose();
-	}
-	
-	public static BitmapFont getFont() {
-		return font;
 	}
 }

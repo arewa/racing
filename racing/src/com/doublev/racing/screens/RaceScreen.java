@@ -11,6 +11,7 @@ public class RaceScreen implements Screen {
 	private RaceStage stage;
 	
 	public RaceScreen() {
+		
 		stage = new RaceStage(new ScreenViewport());
 		
 		Gdx.input.setInputProcessor(stage);
