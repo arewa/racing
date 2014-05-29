@@ -5,7 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.doublev.racing.helpers.Assets;
-import com.doublev.racing.screens.RaceScreen;
+import com.doublev.racing.screens.MainMenuScreen;
 
 public class RacingGame extends Game {
 	
@@ -18,7 +18,7 @@ public class RacingGame extends Game {
 		
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		
-		setScreen(new RaceScreen());
+		setScreen(new MainMenuScreen(this));
 		
 		fps = new FPSLogger();
 	}
@@ -32,6 +32,6 @@ public class RacingGame extends Game {
 	@Override
 	public void dispose() {
 		super.dispose();
-		getScreen().dispose();
+		//getScreen().dispose();
 	}
 }
