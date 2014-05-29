@@ -34,8 +34,6 @@ public class RaceData {
 	public List<Cell> walls = new ArrayList<Cell>();
 	public List<Direction> directions = new ArrayList<Direction>();
 	
-	private Random rand = new Random();
-	
 	public void init(String trackFile) {
 		// Init directions
 		directions.add(new Direction1());
