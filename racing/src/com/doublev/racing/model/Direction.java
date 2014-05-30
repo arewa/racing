@@ -5,13 +5,13 @@ import java.util.List;
 
 public abstract class Direction {
 
-	private RaceData raceData;
+	private World world;
 	private int maxHops;
 
 	protected abstract Cell computeNextPosition(Cell currentPosition);
 	
-	public void updateRaceData(RaceData raceData, int maxHops) {
-		this.raceData = raceData;
+	public void updateRaceData(World world, int maxHops) {
+		this.world = world;
 		this.maxHops = maxHops;
 	}
 
@@ -24,21 +24,21 @@ public abstract class Direction {
 
 		Cell nextPosition = computeNextPosition(startPosition);
 		
-		if (nextPosition.equals(raceData.playerPosition)) {
+		if (nextPosition.equals(world.playerPosition)) {
 			return avaiableTurns;
 		}
 		
-		if (nextPosition.equals(raceData.opponentPosition)) {
+		if (nextPosition.equals(world.opponentPosition)) {
 			return avaiableTurns;
 		}
 		
-		for (Cell w : raceData.walls) {
+		for (Cell w : world.walls) {
 			if (nextPosition.equals(w)) {
 				return avaiableTurns;
 			}
 		}
 		
-		if ((nextPosition.i < 0) || (nextPosition.i >= raceData.trackWidth)) {
+		if ((nextPosition.i < 0) || (nextPosition.i >= world.trackWidth)) {
 			return avaiableTurns;
 		}
 
@@ -46,8 +46,8 @@ public abstract class Direction {
 			return avaiableTurns;
 		}
 		
-		if (nextPosition.j >= raceData.trackHeight) {
-			nextPosition.j = raceData.trackHeight - 1;
+		if (nextPosition.j >= world.trackHeight) {
+			nextPosition.j = world.trackHeight - 1;
 		}
 
 		if (maxHops <= 3) {

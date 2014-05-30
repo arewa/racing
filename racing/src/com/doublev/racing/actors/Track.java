@@ -7,16 +7,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.doublev.racing.constants.Constants;
-import com.doublev.racing.model.RaceData;
+import com.doublev.racing.model.World;
 
 public class Track extends Actor {
 
 	private ShapeRenderer renderer;
-	private RaceData raceData;
+	private World world;
 
-	public Track(RaceData raceData) {
+	public Track(World world) {
 		renderer = new ShapeRenderer();
-		this.raceData = raceData;
+		this.world = world;
 	}
 
 	@Override
@@ -30,8 +30,8 @@ public class Track extends Actor {
 
 		renderer.begin(ShapeType.Line);
 		
-		float maxWidth = raceData.trackWidth * Constants.MAP_CELL_SIZE;
-		float maxHeight = raceData.trackHeight * Constants.MAP_CELL_SIZE;
+		float maxWidth = world.trackWidth * Constants.MAP_CELL_SIZE;
+		float maxHeight = world.trackHeight * Constants.MAP_CELL_SIZE;
 
 		for (float u = 0.0f; u <= maxWidth; u += Constants.MAP_CELL_SIZE) {
 			Vector3 from = new Vector3(u, 0.0f, 0.0f);

@@ -17,13 +17,14 @@ import com.doublev.racing.actors.Walls;
 import com.doublev.racing.constants.Constants;
 import com.doublev.racing.helpers.Assets;
 import com.doublev.racing.model.Cell;
-import com.doublev.racing.model.RaceData;
+import com.doublev.racing.model.World;
+import com.doublev.racing.model.WorldObserver;
 
 public class RaceStage extends Stage {
 	
 	private Track track;
 	
-	private RaceData raceData;
+	public World world;
 	private PlayerCar playerCar;
 	private OpponentCar opponentCar;
 	private AreaAvailableForTurn playerAreaAvailableForTurn;
@@ -45,25 +46,25 @@ public class RaceStage extends Stage {
 		
 		batcher = new SpriteBatch();
 		
-		raceData = new RaceData();
-		raceData.init(Constants.TRACK1_FILE);
-		raceData.update(raceData.playerPosition);
+		world = new World();
+		world.init(Constants.TRACK1_FILE);
+		world.update(world.playerPosition);
 		
-		track = new Track(raceData);	
+		track = new Track(world);	
 		
 		playerCar = new PlayerCar();
-		playerCar.setCell(raceData.playerPosition);
+		playerCar.setCell(world.playerPosition);
 		playerAreaAvailableForTurn = new AreaAvailableForTurn(Color.LIGHT_GRAY);
-		playerAreaAvailableForTurn.setAvailableTurns(raceData.availableTurns);
+		playerAreaAvailableForTurn.setAvailableTurns(world.availableTurns);
 		
 		opponentCar = new OpponentCar();
-		opponentCar.setCell(raceData.opponentPosition);
+		opponentCar.setCell(world.opponentPosition);
 		opponentAreaAvailableForTurn = new AreaAvailableForTurn(Color.TEAL);
-		opponentAreaAvailableForTurn.setAvailableTurns(raceData.opponentAvailableTurns);
+		opponentAreaAvailableForTurn.setAvailableTurns(world.opponentAvailableTurns);
 		opponentAreaAvailableForTurn.setVisible(false);
 		
 		walls = new Walls();
-		walls.setWalls(raceData.walls);
+		walls.setWalls(world.walls);
 		
 		addActor(track);
 		addActor(walls);
@@ -87,14 +88,14 @@ public class RaceStage extends Stage {
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 				Cell turn = new Cell((int)(touchPoint.x / Constants.MAP_CELL_SIZE), (int)(touchPoint.y / Constants.MAP_CELL_SIZE));
 				
-				if (raceData.isTurnAvaiable(turn)) {
-					raceData.update(turn);
+				if (world.isTurnAvaiable(turn)) {
+					world.update(turn);
 					
-					playerAreaAvailableForTurn.setAvailableTurns(raceData.availableTurns);
-					playerCar.setCell(raceData.playerPosition);
+					playerAreaAvailableForTurn.setAvailableTurns(world.availableTurns);
+					playerCar.setCell(world.playerPosition);
 					
-					opponentAreaAvailableForTurn.setAvailableTurns(raceData.opponentAvailableTurns);
-					opponentCar.setCell(raceData.opponentPosition);
+					opponentAreaAvailableForTurn.setAvailableTurns(world.opponentAvailableTurns);
+					opponentCar.setCell(world.opponentPosition);
 				}
 			}
 
@@ -139,8 +140,8 @@ public class RaceStage extends Stage {
 		batcher.enableBlending();
 		
 		batcher.begin();
-		Assets.fontOrange.draw(batcher, new StringBuilder().append("speed: ").append(raceData.playerSpeed), 5, 15);
-		Assets.fontGreen.draw(batcher, new StringBuilder().append("speed: ").append(raceData.opponentSpeed), 80, 15);
+		Assets.fontOrange.draw(batcher, new StringBuilder().append("speed: ").append(world.playerSpeed), 5, 15);
+		Assets.fontGreen.draw(batcher, new StringBuilder().append("speed: ").append(world.opponentSpeed), 80, 15);
 		batcher.end();
 	}
 }

@@ -18,7 +18,10 @@ import com.doublev.racing.model.impl.Direction6;
 import com.doublev.racing.model.impl.Direction7;
 import com.doublev.racing.model.impl.Direction8;
 
-public class RaceData {
+public class World {
+	
+	public static final int STATE_GAME_OVER = 1;
+	
 	public int trackWidth;
 	public int trackHeight;
 	
@@ -33,6 +36,8 @@ public class RaceData {
 	
 	public List<Cell> walls = new ArrayList<Cell>();
 	public List<Direction> directions = new ArrayList<Direction>();
+	
+	private List<WorldObserver> observers = new ArrayList<WorldObserver>();
 	
 	public void init(String trackFile) {
 		// Init directions
@@ -68,7 +73,12 @@ public class RaceData {
 		
 		computeOpponentTurn();
 		
-		resetPositions();
+		if ((playerPosition.j >= (this.trackHeight - 1)) || (opponentPosition.j >= (this.trackHeight - 1))) {
+			updateWorldState(World.STATE_GAME_OVER);
+			return;
+		}
+		
+		resetAvailableTurns();
 
 		for (Direction d : directions) {
 			d.updateRaceData(this, playerSpeed + 1);
@@ -79,7 +89,7 @@ public class RaceData {
 		}
 	}
 	
-	public void resetPositions() {
+	public void resetAvailableTurns() {
 		availableTurns.clear();
 		opponentAvailableTurns.clear();
 	}
@@ -214,5 +224,15 @@ public class RaceData {
 				row ++;
 			}
 		} catch (IOException e) {}
+	}
+	
+	private void updateWorldState(int state) {
+		for (WorldObserver wo : observers) {
+			wo.worldChanged(state);
+		}
+	}
+	
+	public void addObserver(WorldObserver observer) {
+		this.observers.add(observer);
 	}
 }
