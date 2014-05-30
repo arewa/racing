@@ -96,6 +96,8 @@ public class RaceStage extends Stage {
 					
 					opponentAreaAvailableForTurn.setAvailableTurns(world.opponentAvailableTurns);
 					opponentCar.setCell(world.opponentPosition);
+					
+					getCamera().position.set(x, y, 0);
 				}
 			}
 

@@ -3,6 +3,7 @@
 	<name>racing-android</name>
 	<comment></comment>
 	<projects>
+		<project>racing</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
