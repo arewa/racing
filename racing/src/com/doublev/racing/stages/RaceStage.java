@@ -67,10 +67,11 @@ public class RaceStage extends Stage {
 		walls.setWalls(world.walls);
 		
 		addActor(track);
-		addActor(walls);
 		
 		addActor(opponentAreaAvailableForTurn);
 		addActor(playerAreaAvailableForTurn);
+		
+		addActor(walls);
 		
 		addActor(opponentCar);
 		addActor(playerCar);

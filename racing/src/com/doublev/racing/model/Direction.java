@@ -29,11 +29,17 @@ public abstract class Direction {
 		}
 		
 		if (nextPosition.equals(world.opponentPosition)) {
+			if (!avaiableTurns.contains(nextPosition)) {
+				avaiableTurns.add(nextPosition);
+			}
 			return avaiableTurns;
 		}
 		
 		for (Cell w : world.walls) {
 			if (nextPosition.equals(w)) {
+				if (!avaiableTurns.contains(nextPosition)) {
+					avaiableTurns.add(nextPosition);
+				}
 				return avaiableTurns;
 			}
 		}

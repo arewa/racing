@@ -54,7 +54,6 @@ public class World {
 	}
 	
 	public void updatePlayerPosition(Cell pos) {
-		updatePlayerSpeed(pos);
 		this.playerPosition = pos;
 	}
 	
@@ -67,6 +66,18 @@ public class World {
 		
 		if (playerPosition == null) {
 			return;
+		}
+		
+		boolean isTurnCoincideWithOpponent = isTurnCoincideWithOpponent(turn);
+		boolean isTurnCoincideWithWall = isTurnCoincideWithWall(turn);
+		
+		if (isTurnCoincideWithOpponent || isTurnCoincideWithWall) {
+			availableTurns.remove(turn);
+			resetPlayerSpeed();
+		} else if (isTurnCoincideWithOpponent) {
+			resetOpponentSpeed();
+		} else {
+			updatePlayerSpeed(turn);
 		}
 		
 		updatePlayerPosition(turn);
@@ -103,6 +114,28 @@ public class World {
 		}
 		
 		return false;
+	}
+	
+	public boolean isTurnCoincideWithOpponent(Cell turn) {
+		return turn.equals(opponentPosition);
+	}
+	
+	public boolean isTurnCoincideWithWall(Cell turn) {
+		for (Cell w : walls) {
+			if (w.equals(turn)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public void resetPlayerSpeed() {
+		this.playerSpeed = 1;
+	}
+	
+	public void resetOpponentSpeed() {
+		this.opponentSpeed = 1;
 	}
 	
 	private void updatePlayerSpeed(Cell turn) {
