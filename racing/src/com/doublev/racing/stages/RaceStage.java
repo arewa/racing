@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -98,7 +99,7 @@ public class RaceStage extends Stage {
 					opponentAreaAvailableForTurn.setAvailableTurns(world.opponentAvailableTurns);
 					opponentCar.setCell(world.opponentPosition);
 					
-					getCamera().position.set(x, y, 0);
+					getCamera().position.lerp(new Vector3(x, y, 0), 0.3f);
 				}
 			}
 
