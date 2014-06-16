@@ -1,5 +1,8 @@
 package com.doublev.racing.stages;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,6 +21,7 @@ import com.doublev.racing.actors.Walls;
 import com.doublev.racing.constants.Constants;
 import com.doublev.racing.helpers.Assets;
 import com.doublev.racing.model.Cell;
+import com.doublev.racing.model.SmoothCameraDispatcher;
 import com.doublev.racing.model.World;
 import com.doublev.racing.model.WorldObserver;
 
@@ -37,6 +41,8 @@ public class RaceStage extends Stage {
 	
 	private OrthographicCamera guiCamera;
 	private SpriteBatch batcher;
+	
+	private Executor executor;
 
 	public RaceStage(ScreenViewport screenViewport) {
 		
@@ -66,6 +72,8 @@ public class RaceStage extends Stage {
 		
 		walls = new Walls();
 		walls.setWalls(world.walls);
+		
+		executor = Executors.newSingleThreadExecutor();
 		
 		addActor(track);
 		
@@ -99,7 +107,8 @@ public class RaceStage extends Stage {
 					opponentAreaAvailableForTurn.setAvailableTurns(world.opponentAvailableTurns);
 					opponentCar.setCell(world.opponentPosition);
 					
-					getCamera().position.lerp(new Vector3(x, y, 0), 0.3f);
+					//getCamera().position.lerp(new Vector3(x, y, 0), 0.3f);
+					executor.execute(new SmoothCameraDispatcher(getCamera(), new Vector2(x, y)));
 				}
 			}
 
